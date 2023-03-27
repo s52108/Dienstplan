@@ -1,0 +1,56 @@
+import java.io.*;
+
+public class DienstplanHelper {
+    public static void main(String[] args) {
+        String inputFileName = "input.txt";
+        String outputFileName = "output.csv";
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
+
+            String input = "";
+            String line;
+            while ((line = reader.readLine()) != null) {
+                input += line + "\n";
+            }
+
+            String csvOutput = txtToCsv(input);
+
+            writer.write(csvOutput);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String txtToCsv(String input) {
+        String[] lines = input.split("\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("START DATE,START TIME,END DATE,END TIME,Subject\n");
+
+        for (String line : lines) {
+            String[] fields = line.split("\t");
+
+            if (fields.length < 5) {
+                continue; // ignore rows without start/end time
+            }
+
+            String startDate = fields[3];
+            String startTime = fields[4].split("-")[0].trim();
+            String endDate = "";
+            String endTime = "";
+            String subject = fields[2];
+
+            if (fields[4].contains("-")) {
+                endDate = startDate;
+                endTime = fields[4].split("-")[1].trim();
+            }
+
+            if (!startTime.equals("") && !endTime.equals("")) {
+                sb.append(startDate).append(",").append(startTime).append(",").append(endDate).append(",").append(endTime).append(",").append(subject).append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+}
